@@ -1,0 +1,51 @@
+syntax = "proto2";
+
+message BlobHeader {
+    required string type = 1;
+    optional bytes indexdata = 2;
+    required int32 datasize = 3;
+}
+
+message Blob {
+    optional bytes raw = 1; // No compression
+    optional int32 raw_size = 2; // When compressed, the uncompressed size
+
+    // Possible compressed versions of the data.
+    optional bytes zlib_data = 3;
+
+    // PROPOSED feature for LZMA compressed data. SUPPORT IS NOT REQUIRED.
+    optional bytes lzma_data = 4;
+
+    // Formerly used for bzip2 compressed data. Depreciated in 2010.
+    optional bytes OBSOLETE_bzip2_data = 5 [deprecated=true]; // Don't reuse this tag number.
+}
+
+message HeaderBlock {
+    optional HeaderBBox bbox = 1;
+    /* Additional tags to aid in parsing this dataset */
+    repeated string required_features = 4;
+    repeated string optional_features = 5;
+
+    optional string writingprogram = 16;
+    optional string source = 17; // From the bbox field.
+
+    /* Tags that allow continuing an Osmosis replication */
+
+    // replication timestamp, expressed in seconds since the epoch,
+    // otherwise the same value as in the "timestamp=..." field
+    // in the state.txt file used by Osmosis
+    optional int64 osmosis_replication_timestamp = 32;
+
+    // replication sequence number (sequenceNumber in state.txt)
+    optional int64 osmosis_replication_sequence_number = 33;
+
+    // replication base URL (from Osmosis' configuration.txt file)
+    optional string osmosis_replication_base_url = 34;
+}
+
+message HeaderBBox {
+    required sint64 left = 1;
+    required sint64 right = 2;
+    required sint64 top = 3;
+    required sint64 bottom = 4;
+}
